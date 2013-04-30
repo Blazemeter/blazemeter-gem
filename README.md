@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+TODO: Write usage instructions
 
 You can use BlazeMeter either from command line or from your Ruby code. 
 
@@ -35,54 +35,65 @@ To start a test:
      blazemeter testStart
 	 
 or
-blazemeter testStart(123)
+
+     blazemeter testStart(123)
 
 To stop a test:
-blazemeter testStop
+
+     blazemeter testStop
+	 
 or
-blazemeter testStop(123)
+
+     blazemeter testStop(123)
 
 To update a test:
-blazemeter testUpdate
--this will prompt you to enter test id, max_users and location for the test.
--you can also prefil those values:
-blazemeter testUpdate(123, 30, 'us-west-2')
 
+     blazemeter testUpdate
+	 
+-this will prompt you to enter test id, max_users and location for the test.
+-you can also prefil those values
+
+     blazemeter testUpdate(123, 30, 'us-west-2')
+	 
 To get test status:
-blazemeter testGetStatus
+
+     blazemeter testGetStatus
+	 
 or
-blazemeter testGetStatus(123)
+
+     blazemeter testGetStatus(123)
 
 To get list of valid locations:
-blazemeter getLocations
+
+     blazemeter getLocations
 
 Usage from the Ruby code:
 
 To use BlazeMeter in your ruby code, first you must include it:
-require "blazemeter"
+
+     require "blazemeter"
 
 Then you can instantiate BlazeMeter class with your user key:
-blaze = Blazemeter.new('12345678')
+
+     blaze = Blazemeter.new('12345678')
 
 To create a new test:
-test_id = blaze.testCreate(test_name, max_users, location)
+
+     test_id = blaze.testCreate(test_name, max_users, location)
 
 To start a test:
-blaze.testStart(test_id)
+
+     blaze.testStart(test_id)
 
 To stop a test:
-blaze.testStop(test_id)
+
+     blaze.testStop(test_id)
 
 To update a test:
-blaze.testUpdate(test_id, max_users, location)
+
+     blaze.testUpdate(test_id, max_users, location)
 
 To get test status:
-blaze.testGetStatus(test_id)
 
-## Contributing
+     blaze.testGetStatus(test_id)
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
