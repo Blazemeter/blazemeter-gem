@@ -8,5 +8,6 @@ require 'blazemeter'
 argv = ARGV.dup
 ARGV.clear
 cmd = argv.shift.strip rescue 'help'
-puts cmd
-#Blitz.run cmd, argv
+blaze = Blazemeter.new
+blaze.send(cmd)
+

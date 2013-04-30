@@ -25,34 +25,34 @@ You can use BlazeMeter either from command line or from your Ruby code.
 Command line usage
 
 To create a new test:
-ruby -r "./blazemeter.rb" -e "Blazemeter.new.testCreate"
+blazemeter testCreate
 -this will prompt you to enter USER_KEY, test name, max_users and location for the test.
 -you can also prefil those values:
-ruby -r "./blazemeter.rb" -e "Blazemeter.new(12345678).testCreate('my test', 50, 'us-west-1')"
+blazemeter testCreate('my test', 50, 'us-west-1')
 
 To start a test:
-ruby -r "./blazemeter.rb" -e "Blazemeter.new.testStart"
+blazemeter testStart
 or
-ruby -r "./blazemeter.rb" -e "Blazemeter.new.testStart(123)"
+blazemeter testStart(123)
 
 To stop a test:
-ruby -r "./blazemeter.rb" -e "Blazemeter.new.testStop"
+blazemeter testStop
 or
-ruby -r "./blazemeter.rb" -e "Blazemeter.new.testStop(123)"
+blazemeter testStop(123)
 
 To update a test:
-ruby -r "./blazemeter.rb" -e "Blazemeter.new.testUpdate"
+blazemeter testUpdate
 -this will prompt you to enter test id, max_users and location for the test.
 -you can also prefil those values:
-ruby -r "./blazemeter.rb" -e "Blazemeter.new(12345678).testUpdate(123, 30, 'us-west-2')"
+blazemeter testUpdate(123, 30, 'us-west-2')
 
 To get test status:
-ruby -r "./blazemeter.rb" -e "Blazemeter.new.testGetStatus"
+blazemeter testGetStatus
 or
-ruby -r "./blazemeter.rb" -e "Blazemeter.new.testGetStatus(123)"
+blazemeter testGetStatus(123)
 
 To get list of valid locations:
-ruby -r "./blazemeter.rb" -e "Blazemeter.getLocations"
+blazemeter getLocations
 
 
 Usage from the Ruby code:
