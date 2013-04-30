@@ -31,7 +31,9 @@ blazemeter testCreate
 blazemeter testCreate('my test', 50, 'us-west-1')
 
 To start a test:
-blazemeter testStart
+
+     blazemeter testStart
+	 
 or
 blazemeter testStart(123)
 
@@ -53,7 +55,6 @@ blazemeter testGetStatus(123)
 
 To get list of valid locations:
 blazemeter getLocations
-
 
 Usage from the Ruby code:
 
