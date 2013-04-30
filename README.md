@@ -22,13 +22,16 @@ TODO: Write usage instructions
 
 You can use BlazeMeter either from command line or from your Ruby code. 
 
-Command line usage
+### Command line usage
 
 To create a new test:
-blazemeter testCreate
+
+     blazemeter testCreate
+	 
 -this will prompt you to enter USER_KEY, test name, max_users and location for the test.
 -you can also prefil those values:
-blazemeter testCreate('my test', 50, 'us-west-1')
+
+     blazemeter testCreate('my test', 50, 'us-west-1')
 
 To start a test:
 
@@ -67,7 +70,7 @@ To get list of valid locations:
 
      blazemeter getLocations
 
-Usage from the Ruby code:
+### Usage from the Ruby code
 
 To use BlazeMeter in your ruby code, first you must include it:
 
