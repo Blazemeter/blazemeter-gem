@@ -20,6 +20,64 @@ Or install it yourself as:
 
 TODO: Write usage instructions here
 
+You can use BlazeMeter either from command line or from your Ruby code. 
+
+Command line usage
+
+To create a new test:
+ruby -r "./blazemeter.rb" -e "Blazemeter.new.testCreate"
+-this will prompt you to enter USER_KEY, test name, max_users and location for the test.
+-you can also prefil those values:
+ruby -r "./blazemeter.rb" -e "Blazemeter.new(12345678).testCreate('my test', 50, 'us-west-1')"
+
+To start a test:
+ruby -r "./blazemeter.rb" -e "Blazemeter.new.testStart"
+or
+ruby -r "./blazemeter.rb" -e "Blazemeter.new.testStart(123)"
+
+To stop a test:
+ruby -r "./blazemeter.rb" -e "Blazemeter.new.testStop"
+or
+ruby -r "./blazemeter.rb" -e "Blazemeter.new.testStop(123)"
+
+To update a test:
+ruby -r "./blazemeter.rb" -e "Blazemeter.new.testUpdate"
+-this will prompt you to enter test id, max_users and location for the test.
+-you can also prefil those values:
+ruby -r "./blazemeter.rb" -e "Blazemeter.new(12345678).testUpdate(123, 30, 'us-west-2')"
+
+To get test status:
+ruby -r "./blazemeter.rb" -e "Blazemeter.new.testGetStatus"
+or
+ruby -r "./blazemeter.rb" -e "Blazemeter.new.testGetStatus(123)"
+
+To get list of valid locations:
+ruby -r "./blazemeter.rb" -e "Blazemeter.getLocations"
+
+
+Usage from the Ruby code:
+
+To use BlazeMeter in your ruby code, first you must include it:
+require "blazemeter"
+
+Then you can instantiate BlazeMeter class with your user key:
+blaze = Blazemeter.new('12345678')
+
+To create a new test:
+test_id = blaze.testCreate(test_name, max_users, location)
+
+To start a test:
+blaze.testStart(test_id)
+
+To stop a test:
+blaze.testStop(test_id)
+
+To update a test:
+blaze.testUpdate(test_id, max_users, location)
+
+To get test status:
+blaze.testGetStatus(test_id)
+
 ## Contributing
 
 1. Fork it

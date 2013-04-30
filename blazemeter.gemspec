@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Blazemeter::VERSION
   spec.authors       = ["Tamer Zoubi"]
   spec.email         = ["tamerzg@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Provide BlazeMeter integration with Ruby}
+  spec.summary       = %q{Provide BlazeMeter integration with Ruby}
   spec.homepage      = ""
   spec.license       = "MIT"
 
