@@ -2,16 +2,41 @@ require "rubygems"
 require "json"
 require "net/https"
 require "uri"
+require "fileutils"
+require 'blazemeter/command'
+
+class BlazemeterCmd # :nodoc:    
+    def self.run cmd, argv
+        
+		kname, mname = cmd.split(':', 2)
+        klass = Blazemeter::Command.const_get kname.capitalize rescue nil
+		
+		
+       
+    end    
+end
 
 class Blazemeter
   @@url = 'https://a.blazemeter.com'
   #@@url = 'http://dev1.zoubi.me'
   
   def initialize(user_key=nil)
-    if !user_key
-	user_key = ask_for_credentials
-	end
     @user_key = user_key
+	if !@user_key
+	  @user_key = read_credentials[0]
+	  puts @user_key
+	  exit
+	  if !@user_key
+	    @user_key = ask_for_credentials
+	    write_credentials
+	  end
+	end
+    
+  end
+  
+  def login()
+    @user_key = ask_for_credentials
+	write_credentials
   end
   
   def get_https(uri)
@@ -222,11 +247,32 @@ class Blazemeter
     'ap-northeast-1' => 'Japan (Tokyo)'"
   end
   
+  def credentials_file
+        ENV['HOME'] + '/.blazemeter/credentials'
+    end
+  
   def ask_for_credentials
         puts "Enter your BlazeMeter credentials. You can find this in TODO."
         print "API-Key: "
         apik = gets
         return apik.chomp
+  end
+  
+  def read_credentials
+        File.exists?(credentials_file) and File.read(credentials_file).split("\n")        
+  end
+  
+  def write_credentials
+        FileUtils.mkdir_p(File.dirname(credentials_file))
+        File.open(credentials_file, 'w') do |f|
+          f.puts @user_key
+        end
+        set_credentials_permissions
+    end
+	
+	def set_credentials_permissions
+        FileUtils.chmod 0700, File.dirname(credentials_file)
+        FileUtils.chmod 0600, credentials_file        
     end
 end
 
