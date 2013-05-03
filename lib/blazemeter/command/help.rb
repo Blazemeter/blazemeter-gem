@@ -2,8 +2,9 @@ class Blazemeter
 class Command
 class Help < Command # :nodoc:
     def cmd_default argv
-        puts
-        msg "Usage: blazemeter <command> <options>"
+        
+        msg = "Usage: blazemeter <command> <options>"
+		puts msg
         helps = [
             { :cmd => 'help', :help => "Display this help" },
             { :cmd => 'api:init', :help => 'Store your API key' },
