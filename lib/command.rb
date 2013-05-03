@@ -1,7 +1,9 @@
+require 'blitz/utils'
+
 class Blazemeter
 class Command # :nodoc:
 
 end
-end # Blazemeter
+end # Blitz
 
 Dir["#{File.dirname(__FILE__)}/command/*.rb"].each { |c| require c }

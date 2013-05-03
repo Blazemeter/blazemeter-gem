@@ -1,77 +1,8 @@
-require "rubygems"
-require "json"
-require "net/https"
-require "uri"
-require "fileutils"
-require 'blazemeter/command'
-
-
-class BlazemeterCmd # :nodoc:    
-    def self.run cmd, argv
-        
-		kname, mname = cmd.split(':', 2)
-        klass = Blazemeter::Command.const_get kname.capitalize rescue nil
-		mname ||= 'default'
-        mname = "cmd_#{mname}".to_sym
-		if klass and klass < Blazemeter::Command and klass.method_defined? mname
-            command = klass.new
-            begin
-                command.send mname, argv
-            #rescue e
-             #   puts e.message.chomp('.')
-            end
-        else
-            puts "Unknown command #{cmd}"
-        end        
-    end    
-end
-
 class Blazemeter
-  @@url = 'https://a.blazemeter.com'
-  #@@url = 'http://dev1.zoubi.me'
-  
-  def initialize(user_key=nil)
-    @user_key = user_key
-	if !@user_key
-	  @user_key = read_credentials[0]
-	  puts @user_key
-	  exit
-	  if !@user_key
-	    @user_key = ask_for_credentials
-	    write_credentials
-	  end
-	end
-    
-  end
-  
-  
-  
-  def get_https(uri)
-    https = Net::HTTP.new(uri.host,uri.port)
-    https.use_ssl = true
-    https.verify_mode = OpenSSL::SSL::VERIFY_NONE
-	return https
-  end
-  
-  def post(path, options=nil)
-    uri = URI.parse(@@url+path)
-	options = options.to_json
-    https = get_https(uri)
-    req = Net::HTTP::Post.new(uri.request_uri, initheader = {'Content-Type' =>'application/json'})
-	req.body = options
-	response = https.request(req)
-	return response
-  end
-  
-  def get(path)
-    uri = URI.parse(@@url+path)
-    https = get_https(uri)
-    req = Net::HTTP::Get.new(uri.request_uri)
-	response = https.request(req)
-	return response
-  end
-  
-  def testCreate(test_name=nil, max_users=nil, location=nil)
+class Command
+class Test < Command # :nodoc:
+
+def cmd_create argv
    options = Hash.new
    options["options"] = Hash.new
    
@@ -127,7 +58,7 @@ class Blazemeter
    
   end
   
-  def testStart(test_id=nil)
+  def cmd_start argv
 	if !test_id
      puts "Enter test id: "
 	 user_input = gets
@@ -146,7 +77,7 @@ class Blazemeter
    end   
   end
   
-  def testStop(test_id=nil)
+  def cmd_stop argv
     if !test_id
      puts "Enter test id: "
 	 user_input = gets
@@ -168,7 +99,7 @@ class Blazemeter
    end   
   end
   
-  def testUpdate(test_id=nil, max_users=nil, location=nil)
+  def cmd_update argv
     if !test_id
      puts "Enter test id: "
 	 user_input = gets
@@ -226,7 +157,7 @@ class Blazemeter
    
   end
   
-  def testGetStatus(test_id=nil)
+  def cmd_status argv
    if !test_id
      puts "Enter test id: "
 	 user_input = gets
@@ -241,19 +172,32 @@ class Blazemeter
      puts "Error retrieving status: " + ret["error"]
     end   
   end
-  
-  def self.getLocations()
-    puts "
-	'eu-west-1' => 'EU West (Ireland)'
-    'us-east-1' => 'US East (Virginia)'
-    'us-west-1' => 'US West (N.California)'
-    'us-west-2' => 'US West (Oregon)'
-    'sa-east-1' => 'South America(Sao Paulo)'
-    'ap-southeast-1' => 'Asia Pacific (Singapore)'
-    'ap-southeast-2' => 'Australia (Sydney)'
-    'ap-northeast-1' => 'Japan (Tokyo)'"
+
+  def get_https uri
+    https = Net::HTTP.new(uri.host,uri.port)
+    https.use_ssl = true
+    https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+	return https
   end
   
+  def post(path, options=nil)
+    uri = URI.parse(@@url+path)
+	options = options.to_json
+    https = get_https(uri)
+    req = Net::HTTP::Post.new(uri.request_uri, initheader = {'Content-Type' =>'application/json'})
+	req.body = options
+	response = https.request(req)
+	return response
+  end
   
+  def get path
+    uri = URI.parse(@@url+path)
+    https = get_https(uri)
+    req = Net::HTTP::Get.new(uri.request_uri)
+	response = https.request(req)
+	return response
+  end
+	
 end
-
+end # Command
+end # Blazemeter
