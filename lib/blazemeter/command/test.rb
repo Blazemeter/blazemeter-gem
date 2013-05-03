@@ -6,6 +6,9 @@ def cmd_create argv
    options = Hash.new
    options["options"] = Hash.new
    
+   test = parse argv
+   puts test
+   exit
    if !test_name
      puts "Enter name for the test: "
 	 user_input = gets
@@ -172,6 +175,49 @@ def cmd_create argv
      puts "Error retrieving status: " + ret["error"]
     end   
   end
+  
+   def parse arguments
+        argv = arguments.is_a?(Array) ? arguments : ''
+        args = parse_cli argv
+        raise "help" if args['help'] 
+        #if not args['pattern']
+            #Blitz::Curl::Sprint.new args
+        #else
+            #Blitz::Curl::Rush.new args
+        #end
+  end
+  
+   def parse_cli argv
+        hash = { 'steps' => [] }
+
+        while not argv.empty?
+            hash['steps'] << Hash.new
+            step = hash['steps'].last
+
+            while not argv.empty?
+                break if argv.first[0,1] != '-'
+
+                k = argv.shift
+                if ['-u'].member? k
+				puts k
+                    step['max-users'] = shift(k, argv)
+                    next
+                end
+			end	
+		  break if hash['help']
+
+            url = argv.shift
+            raise ArgumentError, "no URL specified!" if not url
+            step['url'] = url	
+		end
+		if not hash['help']
+            if hash['steps'].empty?
+                raise ArgumentError, "no URL specified!"
+            end
+        end
+
+        hash
+    end		
 
   def get_https uri
     https = Net::HTTP.new(uri.host,uri.port)
