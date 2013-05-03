@@ -1,7 +1,7 @@
 require 'blazemeter/utils'
 class Blazemeter
 class Command # :nodoc:
-
+include Blazemeter::Utils
 end
 end # Blazemeter
 

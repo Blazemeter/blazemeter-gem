@@ -19,6 +19,10 @@ class API < Command # :nodoc:
 	write_credentials
   end
   
+  def get_user_key
+    @user_key = read_credentials[0]
+  end
+  
   def credentials_file
         ENV['HOME'] + '/.blazemeter/credentials'
   end

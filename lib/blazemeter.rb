@@ -4,11 +4,13 @@ require "net/https"
 require "uri"
 require "fileutils"
 require 'blazemeter/command'
+require 'blazemeter/utils'
+require 'blazemeter/common'
 
-
-class BlazemeterCmd # :nodoc:    
+class Blazemeter # :nodoc:    
     def self.run cmd, argv
-        
+        puts Blazemeter::Utils.mytest
+		exit
 		kname, mname = cmd.split(':', 2)
         klass = Blazemeter::Command.const_get kname.capitalize rescue nil
 		mname ||= 'default'
@@ -26,7 +28,7 @@ class BlazemeterCmd # :nodoc:
     end    
 end
 
-class Blazemeter
+class BlazemeterApi
   @@url = 'https://a.blazemeter.com'
   #@@url = 'http://dev1.zoubi.me'
   
@@ -43,8 +45,6 @@ class Blazemeter
 	end
     
   end
-  
-  
   
   def get_https(uri)
     https = Net::HTTP.new(uri.host,uri.port)
@@ -241,19 +241,6 @@ class Blazemeter
      puts "Error retrieving status: " + ret["error"]
     end   
   end
-  
-  def self.getLocations()
-    puts "
-	'eu-west-1' => 'EU West (Ireland)'
-    'us-east-1' => 'US East (Virginia)'
-    'us-west-1' => 'US West (N.California)'
-    'us-west-2' => 'US West (Oregon)'
-    'sa-east-1' => 'South America(Sao Paulo)'
-    'ap-southeast-1' => 'Asia Pacific (Singapore)'
-    'ap-southeast-2' => 'Australia (Sydney)'
-    'ap-northeast-1' => 'Japan (Tokyo)'"
-  end
-  
   
 end
 

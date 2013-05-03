@@ -8,5 +8,5 @@ require 'blazemeter'
 argv = ARGV.dup
 ARGV.clear
 cmd = argv.shift.strip rescue 'help'
-BlazemeterCmd.run cmd, argv
+Blazemeter.run cmd, argv
 
