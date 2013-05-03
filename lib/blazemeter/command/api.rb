@@ -18,25 +18,23 @@ class API < Command # :nodoc:
     @user_key = ask_for_credentials
 	write_credentials
   end
-  
-  def get_user_key
-    @user_key = read_credentials[0]
+
+  def credentials_file
+      Blazemeter::Common.credentials_file
   end
   
-  def credentials_file
-        ENV['HOME'] + '/.blazemeter/credentials'
+  def read_credentials
+      Blazemeter::Common.read_credentials
   end
   
   def ask_for_credentials
         puts "Enter your BlazeMeter credentials. You can find this in TODO."
         print "API-Key: "
         apik = gets
-        return apik.chomp
+        return apik.chomp.strip
   end
   
-  def read_credentials
-        File.exists?(credentials_file) and File.read(credentials_file).split("\n")        
-  end
+  
   
   def write_credentials
         FileUtils.mkdir_p(File.dirname(credentials_file))

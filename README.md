@@ -24,51 +24,59 @@ You can use BlazeMeter either from command line or from your Ruby code.
 
 ### Command line usage
 
+First you must initialize your Blazemeter instance:
+    blazemeter api:init
+
+This will prompt you to enter your user key which will be saved so you don't need to do it again.
+However if you want to change your user key you can do it by using api:login command:
+
+    blazemeter api:login	
+
 To create a new test:
 
-     blazemeter testCreate
+     blazemeter test:create
 	 
--this will prompt you to enter USER_KEY, test name, max_users and location for the test.
+-this will prompt you to enter test name, max_users and location for the test.
 -you can also prefil those values:
 
-     blazemeter testCreate('my test', 50, 'us-west-1')
+     blazemeter test:create -u 1000 -n mytestname -l us-west-1
 
 To start a test:
 
-     blazemeter testStart
+     blazemeter test:start
 	 
 or
 
-     blazemeter testStart(123)
+     blazemeter test:start -i 123
 
 To stop a test:
 
-     blazemeter testStop
+     blazemeter test:stop
 	 
 or
 
-     blazemeter testStop(123)
+     blazemeter test:start -i 123
 
 To update a test:
 
-     blazemeter testUpdate
+     blazemeter test:update
 	 
 -this will prompt you to enter test id, max_users and location for the test.
 -you can also prefil those values
 
-     blazemeter testUpdate(123, 30, 'us-west-2')
+     blazemeter test:update -i 123 -u 500 -l us-east-1
 	 
 To get test status:
 
-     blazemeter testGetStatus
+     blazemeter test:status
 	 
 or
 
-     blazemeter testGetStatus(123)
+     blazemeter test:update -i 123
 
 To get list of valid locations:
 
-     blazemeter getLocations
+     blazemeter help:locations
 
 ### Usage from the Ruby code
 

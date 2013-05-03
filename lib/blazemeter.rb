@@ -9,8 +9,7 @@ require 'blazemeter/common'
 
 class Blazemeter # :nodoc:    
     def self.run cmd, argv
-        puts Blazemeter::Utils.mytest
-		exit
+	
 		kname, mname = cmd.split(':', 2)
         klass = Blazemeter::Command.const_get kname.capitalize rescue nil
 		mname ||= 'default'
@@ -19,8 +18,8 @@ class Blazemeter # :nodoc:
             command = klass.new
             begin
                 command.send mname, argv
-            #rescue e
-             #   puts e.message.chomp('.')
+            rescue Test::Unit::AssertionFailedError, ArgumentError => e
+                $stderr.puts "!! #{e.message.chomp('.')}" 
             end
         else
             puts "Unknown command #{cmd}"
@@ -32,18 +31,8 @@ class BlazemeterApi
   @@url = 'https://a.blazemeter.com'
   #@@url = 'http://dev1.zoubi.me'
   
-  def initialize(user_key=nil)
+  def initialize(user_key)
     @user_key = user_key
-	if !@user_key
-	  @user_key = read_credentials[0]
-	  puts @user_key
-	  exit
-	  if !@user_key
-	    @user_key = ask_for_credentials
-	    write_credentials
-	  end
-	end
-    
   end
   
   def get_https(uri)
@@ -103,8 +92,6 @@ class BlazemeterApi
    
    path = '/api/rest/blazemeter/testCreate.json?user_key=' + @user_key + '&test_name=' + URI.escape(test_name) 
    response = post(path, options)
-   #file = File.open("some_file.txt", "w")
-  #file.write(response.body) 
    
    if response.body == ''
      puts "BlazeMeter server not responding"

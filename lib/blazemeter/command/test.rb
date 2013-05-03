@@ -11,7 +11,7 @@ def cmd_create argv
    options["options"] = Hash.new
 
    begin
-     user_key = Blazemeter::Command::API.get_user_key
+     user_key = Blazemeter::Common.get_user_key
 	 vars = Blazemeter::Command::Test.parse argv
 	 blaze = BlazemeterApi.new(user_key)
 	 blaze.testCreate(vars["test_name"], vars["max_users"], vars["location"])
@@ -22,7 +22,7 @@ def cmd_create argv
   
   def cmd_start argv
 	begin
-     user_key = Blazemeter::Command::API.get_user_key
+     user_key = Blazemeter::Common.get_user_key
 	 vars = Blazemeter::Command::Test.parse argv
 	 blaze = BlazemeterApi.new(user_key)
 	 blaze.testStart(vars["test_id"])
@@ -33,7 +33,7 @@ def cmd_create argv
   
   def cmd_stop argv
     begin
-     user_key = Blazemeter::Command::API.get_user_key
+     user_key = Blazemeter::Common.get_user_key
 	 vars = Blazemeter::Command::Test.parse argv
 	 blaze = BlazemeterApi.new(user_key)
 	 blaze.testStop(vars["test_id"])
@@ -44,7 +44,7 @@ def cmd_create argv
   
   def cmd_update argv
     begin
-     user_key = Blazemeter::Command::API.get_user_key
+     user_key = Blazemeter::Common.get_user_key
 	 vars = Blazemeter::Command::Test.parse argv
 	 blaze = BlazemeterApi.new(user_key)
 	 blaze.testUpdate(vars["test_id"], vars["max_users"], vars["location"])
@@ -55,7 +55,7 @@ def cmd_create argv
   
   def cmd_status argv
     begin
-     user_key = Blazemeter::Command::API.get_user_key
+     user_key = Blazemeter::Common.get_user_key
 	 vars = Blazemeter::Command::Test.parse argv
 	 blaze = BlazemeterApi.new(user_key)
 	 blaze.testGetStatus(vars["test_id"])
@@ -105,9 +105,9 @@ def cmd_create argv
 		  break if hash['help']
 		end
 		if not hash['help']
-            if hash['steps'].empty?
-                raise ArgumentError, "no options specified!"
-            end
+            #if hash['steps'].empty?
+             #   raise ArgumentError, "no options specified!"
+            #end
         end
 
         hash
