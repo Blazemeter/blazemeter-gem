@@ -36,10 +36,10 @@ To create a new test:
 
      blazemeter test:create
 	 
--this will prompt you to enter test name, max_users and location for the test.
--you can also prefil those values:
+-this will prompt you to enter test name, max users (or max users per load engine if -en is set), location, jmeter version, ramp up, iterations, duration and number of engines for the test.
+-you can also prefil those values in command line:
 
-     blazemeter test:create -u 1000 -n mytestname -l us-west-1
+     blazemeter test:create -u 1000 -n mytestname -l us-west-1 -j 2.9 -r 300 -i 100 -d 100 -en 2
 
 To start a test:
 
@@ -47,7 +47,7 @@ To start a test:
 	 
 or
 
-     blazemeter test:start -i 123
+     blazemeter test:start -id 123
 
 To stop a test:
 
@@ -55,16 +55,16 @@ To stop a test:
 	 
 or
 
-     blazemeter test:start -i 123
+     blazemeter test:start -id 123
 
 To update a test:
 
      blazemeter test:update
 	 
--this will prompt you to enter test id, max_users and location for the test.
+-this will prompt you to enter test id, max users (or max users per load engine if -en is set), location, jmeter version, ramp up, iterations, duration and number of engines for the test
 -you can also prefil those values
 
-     blazemeter test:update -i 123 -u 500 -l us-east-1
+     blazemeter test:update -id 123 -u 500 -l us-east-1 -j 2.9 -r 300 -i 100 -d 100 -en 2
 	 
 To get test status:
 
@@ -72,7 +72,7 @@ To get test status:
 	 
 or
 
-     blazemeter test:update -i 123
+     blazemeter test:update -id 123
 
 To get list of valid locations:
 
@@ -86,11 +86,11 @@ To use BlazeMeter in your ruby code, first you must include it:
 
 Then you can instantiate BlazeMeter class with your user key:
 
-     blaze = Blazemeter.new('12345678')
+     blaze = BlazemeterApi.new('12345678')
 
 To create a new test:
 
-     test_id = blaze.testCreate(test_name, max_users, location)
+     test_id = blaze.testCreate(test_name, options)
 
 To start a test:
 
@@ -102,7 +102,7 @@ To stop a test:
 
 To update a test:
 
-     blaze.testUpdate(test_id, max_users, location)
+     blaze.testUpdate(test_id, options)
 
 To get test status:
 

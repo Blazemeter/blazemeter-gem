@@ -60,39 +60,15 @@ class BlazemeterApi
 	return response
   end
   
-  def testCreate(test_name=nil, max_users=nil, location=nil)
-   options = Hash.new
-   options["options"] = Hash.new
-   
+  def testCreate(test_name=nil, options=nil)
    if !test_name
-     puts "Enter name for the test: "
-	 user_input = gets
-	 test_name = user_input.chomp
-   end
-   
-   if !max_users
-     puts "Enter MAX_USERS: "
-	 user_input = gets
-	 max_users = user_input.chomp
-   end
-   
-   if !location
-     puts "Enter LOCATION: "
-	 user_input = gets
-	 location = user_input.chomp
-   end
-   
-   if max_users != ''
-     options["options"]["MAX_USERS"] = max_users
-   end
-   
-   if location != ''
-     options["options"]["LOCATION"] = location
+     test_name = "Automatic Ruby Test "+Time.new.inspect
    end
    
    path = '/api/rest/blazemeter/testCreate.json?user_key=' + @user_key + '&test_name=' + URI.escape(test_name) 
-   response = post(path, options)
    
+   response = post(path, options)
+
    if response.body == ''
      puts "BlazeMeter server not responding"
 	 return nil
@@ -114,12 +90,7 @@ class BlazemeterApi
    
   end
   
-  def testStart(test_id=nil)
-	if !test_id
-     puts "Enter test id: "
-	 user_input = gets
-	 test_id = user_input.chomp
-    end
+  def testStart(test_id)
 	path = '/api/rest/blazemeter/testStart.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
     response = get(path)
     ret = JSON.parse(response.body)
@@ -133,17 +104,10 @@ class BlazemeterApi
    end   
   end
   
-  def testStop(test_id=nil)
-    if !test_id
-     puts "Enter test id: "
-	 user_input = gets
-	 test_id = user_input.chomp
-    end
+  def testStop(test_id)
     path = '/api/rest/blazemeter/testStop.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
 	response = get(path)
-    puts "Response #{response.code} #{response.message}:
-          #{response.body}"
-		  
+   
     ret = JSON.parse(response.body)
 	if !ret["error"] and ret["response_code"] == 200
 	 puts "BlazeMeter test stopped"
@@ -155,42 +119,9 @@ class BlazemeterApi
    end   
   end
   
-  def testUpdate(test_id=nil, max_users=nil, location=nil)
-    if !test_id
-     puts "Enter test id: "
-	 user_input = gets
-	 test_id = user_input.chomp
-    end
-	
-	if !max_users
-     puts "Enter MAX_USERS: "
-	 user_input = gets
-	 max_users = user_input.chomp
-   end
-   
-   if !location
-     puts "Enter LOCATION: "
-	 user_input = gets
-	 location = user_input.chomp
-   end
-	
+  def testUpdate(test_id, options=nil)
     path = '/api/rest/blazemeter/testUpdate.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
-	options = Hash.new
-    options["options"] = Hash.new
-	
-   if max_users != ''
-     options["options"]["MAX_USERS"] = max_users
-   end
-   
-   if location != ''
-     options["options"]["LOCATION"] = location
-   end
-   
-   if (options)
-	options = options.to_json
-   end	
-	
-   response = post(path, options)
+    response = post(path, options)
    
    if response.body == ''
      puts "BlazeMeter server not responding"
@@ -213,12 +144,7 @@ class BlazemeterApi
    
   end
   
-  def testGetStatus(test_id=nil)
-   if !test_id
-     puts "Enter test id: "
-	 user_input = gets
-	 test_id = user_input.chomp
-    end
+  def testGetStatus(test_id)
     path = '/api/rest/blazemeter/testGetStatus.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
 	response = get(path)
     ret = JSON.parse(response.body)
@@ -226,6 +152,17 @@ class BlazemeterApi
       puts "BlazeMeter status: " + ret["status"]
     else
      puts "Error retrieving status: " + ret["error"]
+    end   
+  end
+  
+   def testGetArchive(test_id)
+    path = '/api/rest/blazemeter/testGetArchive.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
+	response = get(path)
+    ret = JSON.parse(response.body)
+	if !ret["error"] and ret["response_code"] == 200
+      ret["reports"].each_with_index {|val, index| puts "#{val} => #{index}" }
+    else
+     puts "Error retrieving archive: " + ret["error"]
     end   
   end
   
