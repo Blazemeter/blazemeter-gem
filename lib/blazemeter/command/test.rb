@@ -27,7 +27,7 @@ def cmd_create argv
      end
 
    if !vars["options"]["LOCATION"]
-     puts "Enter LOCATION: "
+     puts "Enter location(US Virginia): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["LOCATION"] = user_input.chomp
@@ -35,7 +35,7 @@ def cmd_create argv
    end
    
    if !vars["options"]["JMETER_VERSION"]
-     puts "Enter JMETER_VERSION: "
+     puts "Enter Jmeter version(2.9): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["JMETER_VERSION"] = user_input.chomp.to_f
@@ -43,7 +43,7 @@ def cmd_create argv
    end
    
    if !vars["options"]["OVERRIDE_RAMP_UP"]
-     puts "Enter RAMP_UP: "
+     puts "Enter ramp up(300sec): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["OVERRIDE_RAMP_UP"] = user_input.chomp.to_i
@@ -88,12 +88,14 @@ def cmd_create argv
 	 user_text = "Maximum number of concurrent users"
    end
    
-   if !vars["options"]["MAX_USERS"]
-     puts "Enter "+user_text+":"
-	 user_input = gets
-	 if user_input.chomp != ""
-	   vars["options"]["MAX_USERS"] = user_input.chomp
-	 end 
+   if !vars["options"]["MAX_USERS"]     
+	 #mandatory field
+	 begin
+      puts "Enter "+user_text+":"
+      user_input = gets.chomp
+     end while user_input.empty?
+	 
+	 vars["options"]["MAX_USERS"] = user_input
    end
    
    if vars["options"]["NUMBER_OF_ENGINES"] && vars["options"]["MAX_USERS"]
@@ -162,6 +164,7 @@ def cmd_create argv
     options["options"] = Hash.new
 	begin
      user_key = Blazemeter::Common.get_user_key
+	 blaze = BlazemeterApi.new(user_key)
 	 vars = Blazemeter::Command::Test.parse argv
 
 	 #todo: we need to check test type from existing test
@@ -170,29 +173,29 @@ def cmd_create argv
 	 #todo: check if this can be on even if we don't override anything
 	 vars["options"]["OVERRIDE"] = 1 #turn on overriding
 	 
-	 if !vars["test_id"]
-     puts "Enter test id: "
-	 user_input = gets
-	 if user_input.chomp != ""
-	   test_id = user_input.chomp
-	 else
+	if !vars["test_id"]
+      puts "Enter test id: "
+	  user_input = gets
+	  if user_input.chomp != ""
+	    test_id = user_input.chomp
+	  else
        	puts "Test id is required"
 	    exit 
-	 end
+	  end
 	else
 	  test_id = vars["test_id"]
     end
 	
 	if !vars["options"]["LOCATION"]
-     puts "Enter LOCATION: "
-	 user_input = gets
-	 if user_input.chomp != ""
-	   vars["options"]["LOCATION"] = user_input.chomp
-	 end
-   end
+      puts "Enter location(don't change): "
+	  user_input = gets
+	  if user_input.chomp != ""
+	    vars["options"]["LOCATION"] = user_input.chomp
+	  end
+    end
    
    if !vars["options"]["JMETER_VERSION"]
-     puts "Enter JMETER_VERSION: "
+     puts "Enter Jmeter version(don't change): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["JMETER_VERSION"] = user_input.chomp.to_f
@@ -200,7 +203,7 @@ def cmd_create argv
    end
    
    if !vars["options"]["OVERRIDE_RAMP_UP"]
-     puts "Enter RAMP_UP: "
+     puts "Enter ramp up(don't change): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["OVERRIDE_RAMP_UP"] = user_input.chomp.to_i
@@ -208,7 +211,7 @@ def cmd_create argv
    end
    
    if !vars["options"]["OVERRIDE_ITERATIONS"]
-     puts "Enter iterations(forever): "
+     puts "Enter iterations(don't change): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["OVERRIDE_ITERATIONS"] = user_input.chomp.to_i
@@ -216,7 +219,7 @@ def cmd_create argv
    end
    
    if !vars["options"]["OVERRIDE_DURATION"]
-     puts "Enter duration(forever): "
+     puts "Enter duration(don't change): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["OVERRIDE_DURATION"] = user_input.chomp.to_i
@@ -226,7 +229,7 @@ def cmd_create argv
    if test_type == "jmeter"
      # NUMBER_OF_ENGINES only available if JMeter test was selected in TEST_TYPE
     if !vars["options"]["NUMBER_OF_ENGINES"]
-      puts "Enter number of engines (auto): "
+      puts "Enter number of engines(don't change): "
 	  user_input = gets
 	  if user_input.chomp != ""
 	    vars["options"]["NUMBER_OF_ENGINES"] = user_input.chomp.to_i
@@ -238,7 +241,8 @@ def cmd_create argv
    end
    
    #todo: check number_of_engines value from original test
-   if vars["options"]["NUMBER_OF_ENGINES"]
+   #old_vars = blaze.testLoad(test_id)
+   if vars["options"]["NUMBER_OF_ENGINES"] #|| old_vars["NUMBER_OF_ENGINES"]
      #[Auto] wasn't selected in NUMBER_OF_ENGINES
 	 user_text = "Maximum number of concurrent users per load engine"
    else
@@ -247,7 +251,7 @@ def cmd_create argv
    end
    
    if !vars["options"]["MAX_USERS"]
-     puts "Enter "+user_text+":"
+     puts "Enter "+user_text+"(don't change):"
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["MAX_USERS"] = user_input.chomp
@@ -262,7 +266,6 @@ def cmd_create argv
    
    	 options["options"] = vars["options"]
 	 
-	 blaze = BlazemeterApi.new(user_key)
 	 blaze.testUpdate(test_id, options)
     rescue "help"
       return help
@@ -287,6 +290,31 @@ def cmd_create argv
 	
 	 blaze = BlazemeterApi.new(user_key)
 	 blaze.testGetStatus(vars["test_id"])
+    rescue "help"
+      return help
+    end
+  end
+  
+  def cmd_query argv
+    begin
+     user_key = Blazemeter::Common.get_user_key
+	 vars = Blazemeter::Command::Test.parse argv
+	 
+	 if !vars["test_id"]
+      puts "Enter test id: "
+	  user_input = gets
+	  if user_input.chomp != ""
+	    test_id = user_input.chomp
+	  else
+       	puts "Test id is required"
+	    exit 
+	  end
+	else
+	  test_id = vars["test_id"]
+    end
+	
+	 blaze = BlazemeterApi.new(user_key)
+	 blaze.testGetArchive(test_id)
     rescue "help"
       return help
     end

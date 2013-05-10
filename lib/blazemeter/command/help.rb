@@ -13,7 +13,8 @@ class Help < Command # :nodoc:
             { :cmd => 'test:start', :help => 'starts blazemeter test' },
 			{ :cmd => 'test:stop', :help => 'stops blazemeter test' },
 			{ :cmd => 'test:update', :help => 'updates blazemeter test' },
-			{ :cmd => 'test:status', :help => 'show blazemeter test status' }
+			{ :cmd => 'test:status', :help => 'show blazemeter test status' },
+			{ :cmd => 'test:query', :help => 'returns the report (a zip file)' }
         ]
         
         max_cmd_size = helps.inject(0) { |memo, obj| [ obj[:cmd].size, memo ].max } + 4

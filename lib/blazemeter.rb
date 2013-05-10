@@ -60,6 +60,16 @@ class BlazemeterApi
 	return response
   end
   
+  def getFile(url, filepath)
+    uri = URI.parse(url)
+    https = get_https(uri)
+    resp = https.get(uri.request_uri)
+	
+    open(filepath, "wb") do |file|
+        file.write(resp.body)
+	end
+  end
+  
   def testCreate(test_name=nil, options=nil)
    if !test_name
      test_name = "Automatic Ruby Test "+Time.new.inspect
@@ -155,12 +165,38 @@ class BlazemeterApi
     end   
   end
   
+  def testLoad(test_id)
+    path = '/api/rest/blazemeter/testUpdate.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
+	response = post(path)
+    ret = JSON.parse(response.body)
+	if !ret["error"] and ret["response_code"] == 200
+      return ret["options"]
+    else
+     puts "Error loading test: " + ret["error"]
+	 return nil
+    end   
+  end
+  
    def testGetArchive(test_id)
     path = '/api/rest/blazemeter/testGetArchive.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
+	has_report = false
 	response = get(path)
     ret = JSON.parse(response.body)
 	if !ret["error"] and ret["response_code"] == 200
-      ret["reports"].each_with_index {|val, index| puts "#{val} => #{index}" }
+      ret["reports"].each_with_index {|val, index| 
+		if ret["reports"][index]["zip_url"]
+		  zip_url = ret["reports"][index]["zip_url"]
+		  filename = File.basename zip_url
+		  filepath = Dir.home+"/"+ filename
+		  getFile(zip_url,filepath)
+		  #todo: check that its downloaded
+		  puts "Zip report downloaded to "+filepath
+		  has_report = true
+		end
+	  }
+	   if !has_report
+	     puts "No reports found for test "+test_id
+	   end
     else
      puts "Error retrieving archive: " + ret["error"]
     end   
