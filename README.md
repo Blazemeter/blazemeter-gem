@@ -26,11 +26,15 @@ You can use BlazeMeter either from command line or from your Ruby code.
 
 First you must initialize your Blazemeter instance:
     blazemeter api:init
+	
+or
+	
+	blazemeter api:init -a XXXYYY
 
 This will prompt you to enter your user key which will be saved so you don't need to do it again.
-However if you want to change your user key you can do it by using api:login command:
+However if you want to change your user key you can do it by removing the current key using api:reset command:
 
-    blazemeter api:login	
+    blazemeter api:reset
 
 To create a new test:
 

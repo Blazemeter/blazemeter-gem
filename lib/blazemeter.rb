@@ -3,6 +3,7 @@ require "json"
 require "net/https"
 require "uri"
 require "fileutils"
+require "base64"
 require 'blazemeter/command'
 require 'blazemeter/utils'
 require 'blazemeter/common'
@@ -29,7 +30,7 @@ end
 
 class BlazemeterApi
   @@url = 'https://a.blazemeter.com'
-  #@@url = 'http://dev1.zoubi.me'
+  #@@url = 'http://localhost/ablazemetercom'
   
   def initialize(user_key)
     @user_key = user_key
@@ -45,9 +46,24 @@ class BlazemeterApi
   def post(path, options=nil)
     uri = URI.parse(@@url+path)
 	options = options.to_json
+#puts options
     https = get_https(uri)
     req = Net::HTTP::Post.new(uri.request_uri, initheader = {'Content-Type' =>'application/json'})
 	req.body = options
+	response = https.request(req)
+	return response
+  end
+  
+  def postData(path, filepath)
+    uri = URI.parse(@@url+path)
+	postdata = Hash.new
+	file = File.open(filepath, "rb")
+    f = file.read
+	postdata['data'] = Base64.encode64(f.to_s)
+
+    https = get_https(uri)
+    req = Net::HTTP::Post.new(uri.request_uri, initheader = {'Content-Type' =>'application/json'})
+	req.body = postdata.to_json
 	response = https.request(req)
 	return response
   end
@@ -70,13 +86,24 @@ class BlazemeterApi
 	end
   end
   
+  def normalizeOptions(options)
+    options['options'].each do |index, item|
+	  case index
+        when "LOCATION"
+		  options["options"]["LOCATION"] = Blazemeter::Common.get_location(item.downcase)
+	    end
+    end
+	return options
+  end
+  
   def testCreate(test_name=nil, options=nil)
    if !test_name
      test_name = "Automatic Ruby Test "+Time.new.inspect
    end
    
    path = '/api/rest/blazemeter/testCreate.json?user_key=' + @user_key + '&test_name=' + URI.escape(test_name) 
-   
+   options = normalizeOptions(options)
+   puts options
    response = post(path, options)
 
    if response.body == ''
@@ -154,15 +181,20 @@ class BlazemeterApi
    
   end
   
-  def testGetStatus(test_id)
+  def testGetStatus(test_id, detailed = false)
     path = '/api/rest/blazemeter/testGetStatus.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
+	if detailed
+	  path = path + '&detailed=true'
+	end
+    
 	response = get(path)
     ret = JSON.parse(response.body)
-	if !ret["error"] and ret["response_code"] == 200
-      puts "BlazeMeter status: " + ret["status"]
-    else
-     puts "Error retrieving status: " + ret["error"]
-    end   
+	return ret
+	#if !ret["error"] and ret["response_code"] == 200
+     # puts "BlazeMeter status: " + ret["status"]
+    #else
+     #puts "Error retrieving status: " + ret["error"]
+    #end   
   end
   
   def testLoad(test_id)
@@ -200,6 +232,36 @@ class BlazemeterApi
     else
      puts "Error retrieving archive: " + ret["error"]
     end   
+  end
+  
+  def testScriptUpload(test_id, filepath, filename = nil)
+    path = '/api/rest/blazemeter/testScriptUpload.json?user_key=' + @user_key + '&test_id=' + test_id.to_s
+    if (filename) 
+	 path = path + "&file_name=" + URI.escape(filename)
+    end
+	
+    response = postData(path, filepath)
+   
+   if response.body == ''
+     puts "BlazeMeter server not responding"
+	 return nil
+   end
+   
+   ret = JSON.parse(response.body)
+   
+	if ret["error"]
+     puts "BlazeMeter returned error: "+ret["error"]
+   else
+     if ret["response_code"] == 200
+	 puts ret
+	  puts "BlazeMeter script uploaded sucessfully"
+      return true
+	 else 
+       puts "BlazeMeter script couldn't be uploaded. Error:"+ret["error"].to_s
+	 end
+   end
+   return false
+   
   end
   
 end

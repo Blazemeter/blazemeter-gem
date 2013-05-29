@@ -12,10 +12,15 @@ def cmd_create argv
 
    begin
      user_key = Blazemeter::Common.get_user_key
+	 if !user_key
+	   puts "You must enter API Key. Use blazemeter api:init"
+	   return
+	 end
 	 vars = Blazemeter::Command::Test.parse argv
 	 
 	 vars["options"]["TEST_TYPE"] = "jmeter" #hardcoded until next version
 	 #todo: check if this can be on even if we don't override anything
+	 #todo: move to blazemeter.rb
 	 vars["options"]["OVERRIDE"] = 1 #turn on overriding
 	 
 	 if !vars["test_name"]
@@ -27,15 +32,23 @@ def cmd_create argv
      end
 
    if !vars["options"]["LOCATION"]
-     puts "Enter location(US Virginia): "
+     puts "Enter location(Default - Virginia, California, Oregon, Ireland, Sydney, Tokyo, Singapore, Sao Paulo): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["LOCATION"] = user_input.chomp
 	 end
    end
    
+   if !vars["jmx_filepath"]
+       puts "Enter a path to a JMX file: "
+	   user_input = gets
+	   if user_input.chomp != ""
+	     vars["jmx_filepath"] = user_input.chomp
+	   end
+   end
+   
    if !vars["options"]["JMETER_VERSION"]
-     puts "Enter Jmeter version(2.9): "
+     puts "Enter Jmeter version(Default - 2.9, 2.8, 2.7, 2.6, 2.5, 2.4, 2.3.2): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["JMETER_VERSION"] = user_input.chomp.to_f
@@ -69,10 +82,14 @@ def cmd_create argv
    if vars["options"]["TEST_TYPE"] == "jmeter"
      # NUMBER_OF_ENGINES only available if JMeter test was selected in TEST_TYPE
     if !vars["options"]["NUMBER_OF_ENGINES"]
-      puts "Enter number of engines (auto): "
-	  user_input = gets
-	  if user_input.chomp != ""
-	    vars["options"]["NUMBER_OF_ENGINES"] = user_input.chomp.to_i
+	  #todo: get the limits
+      puts "Enter number of engines(Default- auto, [1-60]): "
+	  user_input = gets.chomp
+	  if user_input != ""
+	    if(user_input.to_i < 1 || user_input.to_i > 60)
+		  puts "Value must be between 1-60"
+		end
+	    vars["options"]["NUMBER_OF_ENGINES"] = user_input.to_i
 	  end
      end
    else 
@@ -82,10 +99,10 @@ def cmd_create argv
    
    if vars["options"]["NUMBER_OF_ENGINES"]
      #[Auto] wasn't selected in NUMBER_OF_ENGINES
-	 user_text = "Maximum number of concurrent users per load engine"
+	 user_text = "Maximum number of concurrent users per load engine[20-36000]"
    else
      #[Auto] Was selected in NUMBER_OF_ENGINES 
-	 user_text = "Maximum number of concurrent users"
+	 user_text = "Maximum number of concurrent users[20-36000]"
    end
    
    if !vars["options"]["MAX_USERS"]     
@@ -109,7 +126,7 @@ def cmd_create argv
 	 end
 	 
 	 options["options"] = vars["options"]
-
+#puts options
 	 blaze = BlazemeterApi.new(user_key)
 	 blaze.testCreate(test_name, options)
     rescue "help"
@@ -241,8 +258,8 @@ def cmd_create argv
    end
    
    #todo: check number_of_engines value from original test
-   #old_vars = blaze.testLoad(test_id)
-   if vars["options"]["NUMBER_OF_ENGINES"] #|| old_vars["NUMBER_OF_ENGINES"]
+   old_vars = blaze.testGetStatus(test_id, true)
+   if vars["options"]["NUMBER_OF_ENGINES"] || old_vars["options"]["NUMBER_OF_ENGINES"] != "0"
      #[Auto] wasn't selected in NUMBER_OF_ENGINES
 	 user_text = "Maximum number of concurrent users per load engine"
    else
@@ -289,7 +306,13 @@ def cmd_create argv
 	 end
 	
 	 blaze = BlazemeterApi.new(user_key)
-	 blaze.testGetStatus(vars["test_id"])
+	 status = blaze.testGetStatus(vars["test_id"])
+	 if !status["error"] and status["response_code"] == 200
+      puts "BlazeMeter status: " + status["status"]
+     else
+      puts "Error retrieving status: " + status["error"]
+     end
+	 
     rescue "help"
       return help
     end
@@ -374,6 +397,14 @@ def cmd_create argv
                 end
 				if ['-en'].member? k
                     hash['options']['NUMBER_OF_ENGINES'] = shift(k, argv).to_i
+                    next
+                end
+				if ['-jmx'].member? k
+                    hash['jmx_filepath'] = shift(k, argv).to_i
+                    next
+                end
+				if ['-a'].member? k
+                    hash['apikey'] = shift(k, argv).to_i
                     next
                 end
 				
