@@ -76,7 +76,15 @@ To get test status:
 	 
 or
 
-     blazemeter test:update -id 123
+     blazemeter test:status -id 123
+	 
+To get test options:
+
+     blazemeter test:options
+	 
+or
+
+     blazemeter test:options -id 123	 
 
 To get list of valid locations:
 

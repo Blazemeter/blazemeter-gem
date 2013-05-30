@@ -38,20 +38,21 @@ class API < Command # :nodoc:
 	end
   end
   
-  def cmd_login argv
-    vars = Blazemeter::Command::Test.parse argv
-	puts vars
-	@user_key = vars["apikey"]
-	if !@user_key
-      @user_key = ask_for_credentials
-	end
-	write_credentials
-  end
-  
   def cmd_reset argv
 	@user_key = nil
 	write_credentials
 	puts "BlazeMeter is reset."
+  end
+  
+  def cmd_validoptions argv
+	user_key = Blazemeter::Common.get_user_key
+	if !user_key
+	   puts "You must enter API Key. Use blazemeter api:init"
+	   return
+	 end
+	blaze = BlazemeterApi.new(user_key)
+	puts "Valid options: "
+    puts blaze.getOptions()	
   end
 
   def credentials_file

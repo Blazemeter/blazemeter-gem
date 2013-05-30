@@ -40,11 +40,17 @@ def cmd_create argv
    end
    
    if !vars["jmx_filepath"]
-       puts "Enter a path to a JMX file: "
-	   user_input = gets
-	   if user_input.chomp != ""
-	     vars["jmx_filepath"] = user_input.chomp
-	   end
+       puts "Enter a path to a JMX file:* "
+	   user_input = gets.chomp
+	   while user_input.empty? || !File.exist?(user_input) do
+	     if !user_input.empty? && !File.exist?(user_input)
+		   puts "File doesn't exist. Please enter absolute path, or relative to the "+Dir.pwd
+		 end
+		 puts "* mandatory field."
+	     puts "Enter a path to a JMX file:* "
+         user_input = gets.chomp
+	   end 
+	   vars["jmx_filepath"] = user_input
    end
    
    if !vars["options"]["JMETER_VERSION"]
@@ -85,10 +91,15 @@ def cmd_create argv
 	  #todo: get the limits
       puts "Enter number of engines(Default- auto, [1-60]): "
 	  user_input = gets.chomp
-	  if user_input != ""
-	    if(user_input.to_i < 1 || user_input.to_i > 60)
+	  while user_input != "" && (user_input.to_i < 1 || user_input.to_i > 60)
+	     if(user_input.to_i < 1 || user_input.to_i > 60)
 		  puts "Value must be between 1-60"
 		end
+		 puts "Enter number of engines(Default- auto, [1-60]): "
+	     user_input = gets.chomp
+	  end
+	  
+	  if user_input != ""
 	    vars["options"]["NUMBER_OF_ENGINES"] = user_input.to_i
 	  end
      end
@@ -105,20 +116,25 @@ def cmd_create argv
 	 user_text = "Maximum number of concurrent users[20-36000]"
    end
    
-   if !vars["options"]["MAX_USERS"]     
+   if !vars["options"]["USERS"]     
 	 #mandatory field
-	 begin
-      puts "Enter "+user_text+":"
+	 puts "Enter "+user_text+":"
+     user_input = gets.chomp
+	 while user_input.empty? || (user_input.to_i < 20 || user_input.to_i > 36000) do
+	  if !user_input.empty? && (user_input.to_i < 20 || user_input.to_i > 36000)
+	    puts "Incorrect value. "
+	  end
+	  puts "* mandatory field."
+	  puts "Enter "+user_text+":*"
       user_input = gets.chomp
-     end while user_input.empty?
-	 
-	 vars["options"]["MAX_USERS"] = user_input
+	 end 
+	 vars["options"]["USERS"] = user_input
    end
    
-   if vars["options"]["NUMBER_OF_ENGINES"] && vars["options"]["MAX_USERS"]
+   if vars["options"]["NUMBER_OF_ENGINES"] && vars["options"]["USERS"]
 	 #[Auto] wasn't selected in NUMBER_OF_ENGINES
-	 vars["options"]["USERS"] = vars["options"]["MAX_USERS"]
-	 vars["options"].delete("MAX_USERS")
+	 vars["options"]["OVERRIDE_THREADS"] = vars["options"]["USERS"]
+	 vars["options"].delete("USERS")
    end
    
      if vars["test_name"]
@@ -128,7 +144,12 @@ def cmd_create argv
 	 options["options"] = vars["options"]
 #puts options
 	 blaze = BlazemeterApi.new(user_key)
-	 blaze.testCreate(test_name, options)
+	 test_id = blaze.testCreate(test_name, options)
+	 if test_id
+	   #Upload JMX script
+	   filename = File.basename(vars["jmx_filepath"])
+	   blaze.testScriptUpload(test_id, vars["jmx_filepath"], filename)
+	 end
     rescue "help"
       return help
     end
@@ -137,6 +158,10 @@ def cmd_create argv
   def cmd_start argv
 	begin
      user_key = Blazemeter::Common.get_user_key
+	 if !user_key
+	   puts "You must enter API Key. Use blazemeter api:init"
+	   return
+	 end
 	 vars = Blazemeter::Command::Test.parse argv
 	 if !vars["test_id"]
        puts "Enter test id: "
@@ -158,6 +183,10 @@ def cmd_create argv
   def cmd_stop argv
     begin
      user_key = Blazemeter::Common.get_user_key
+	 if !user_key
+	   puts "You must enter API Key. Use blazemeter api:init"
+	   return
+	 end
 	 vars = Blazemeter::Command::Test.parse argv
 	  if !vars["test_id"]
        puts "Enter test id: "
@@ -181,6 +210,10 @@ def cmd_create argv
     options["options"] = Hash.new
 	begin
      user_key = Blazemeter::Common.get_user_key
+	 if !user_key
+	   puts "You must enter API Key. Use blazemeter api:init"
+	   return
+	 end
 	 blaze = BlazemeterApi.new(user_key)
 	 vars = Blazemeter::Command::Test.parse argv
 
@@ -203,16 +236,31 @@ def cmd_create argv
 	  test_id = vars["test_id"]
     end
 	
+	old_vars = blaze.testGetStatus(test_id, true)
+	
 	if !vars["options"]["LOCATION"]
-      puts "Enter location(don't change): "
+      puts "Enter location(Default - don't change, California, Oregon, Ireland, Sydney, Tokyo, Singapore, Sao Paulo): "
 	  user_input = gets
 	  if user_input.chomp != ""
 	    vars["options"]["LOCATION"] = user_input.chomp
 	  end
     end
+	
+	if !vars["jmx_filepath"]
+       puts "Enter a path to a JMX file(don't change): "
+	   user_input = gets.chomp
+	   while !user_input.empty? && !File.exist?(user_input) do
+		 puts "File doesn't exist. Please enter absolute path, or relative to the "+Dir.pwd
+	     puts "Enter a path to a JMX file(don't change): "
+         user_input = gets.chomp
+	   end 
+	   if !user_input.empty? 
+	     vars["jmx_filepath"] = user_input
+	   end
+   end
    
    if !vars["options"]["JMETER_VERSION"]
-     puts "Enter Jmeter version(don't change): "
+     puts "Enter Jmeter version(Default - don't change, 2.9, 2.8, 2.7, 2.6, 2.5, 2.4, 2.3.2): "
 	 user_input = gets
 	 if user_input.chomp != ""
 	   vars["options"]["JMETER_VERSION"] = user_input.chomp.to_f
@@ -246,10 +294,17 @@ def cmd_create argv
    if test_type == "jmeter"
      # NUMBER_OF_ENGINES only available if JMeter test was selected in TEST_TYPE
     if !vars["options"]["NUMBER_OF_ENGINES"]
-      puts "Enter number of engines(don't change): "
-	  user_input = gets
-	  if user_input.chomp != ""
-	    vars["options"]["NUMBER_OF_ENGINES"] = user_input.chomp.to_i
+      puts "Enter number of engines(Default- don't change, [1-60]): "
+	  user_input = gets.chomp
+	   while user_input != "" && (user_input.to_i < 1 || user_input.to_i > 60)
+	     if(user_input.to_i < 1 || user_input.to_i > 60)
+		  puts "Value must be between 1-60"
+		end
+		 puts "Enter number of engines(Default- auto, [1-60]): "
+	     user_input = gets.chomp
+	  end
+	  if user_input != ""
+	    vars["options"]["NUMBER_OF_ENGINES"] = user_input.to_i
 	  end
      end
    else 
@@ -258,32 +313,44 @@ def cmd_create argv
    end
    
    #todo: check number_of_engines value from original test
-   old_vars = blaze.testGetStatus(test_id, true)
+   
    if vars["options"]["NUMBER_OF_ENGINES"] || old_vars["options"]["NUMBER_OF_ENGINES"] != "0"
      #[Auto] wasn't selected in NUMBER_OF_ENGINES
-	 user_text = "Maximum number of concurrent users per load engine"
+	 user_text = "Maximum number of concurrent users per load engine(Default- don't change, [20-36000])"
    else
      #[Auto] Was selected in NUMBER_OF_ENGINES 
-	 user_text = "Maximum number of concurrent users"
+	 user_text = "Maximum number of concurrent users(Default- don't change, [20-36000])"
    end
    
-   if !vars["options"]["MAX_USERS"]
-     puts "Enter "+user_text+"(don't change):"
-	 user_input = gets
-	 if user_input.chomp != ""
-	   vars["options"]["MAX_USERS"] = user_input.chomp
+   if !vars["options"]["USERS"]
+     puts "Enter "+user_text+":"
+	 user_input = gets.chomp
+	 
+	 while !user_input.empty? && (user_input.to_i < 20 || user_input.to_i > 36000) do
+	   puts "Incorrect value. "
+	   puts "Enter "+user_text+":"
+       user_input = gets.chomp
+	 end 
+	 
+	 if user_input != ""
+	   vars["options"]["USERS"] = user_input
 	 end 
    end
    
-   if vars["options"]["NUMBER_OF_ENGINES"] && vars["options"]["MAX_USERS"]
+   if (vars["options"]["NUMBER_OF_ENGINES"] || old_vars["options"]["NUMBER_OF_ENGINES"] != "0")&& vars["options"]["USERS"]
 	 #[Auto] wasn't selected in NUMBER_OF_ENGINES
-	 vars["options"]["USERS"] = vars["options"]["MAX_USERS"]
-	 vars["options"].delete("MAX_USERS")
+	 vars["options"]["OVERRIDE_THREADS"] = vars["options"]["USERS"]
+	 vars["options"].delete("USERS")
    end
    
    	 options["options"] = vars["options"]
 	 
 	 blaze.testUpdate(test_id, options)
+	 if vars["jmx_filepath"]
+	   filename = File.basename(vars["jmx_filepath"])
+	   blaze.testScriptUpload(test_id, vars["jmx_filepath"], filename)
+	 end
+	 
     rescue "help"
       return help
     end
@@ -292,6 +359,10 @@ def cmd_create argv
   def cmd_status argv
     begin
      user_key = Blazemeter::Common.get_user_key
+	 if !user_key
+	   puts "You must enter API Key. Use blazemeter api:init"
+	   return
+	 end
 	 vars = Blazemeter::Command::Test.parse argv
 	 
 	 if !vars["test_id"]
@@ -309,6 +380,40 @@ def cmd_create argv
 	 status = blaze.testGetStatus(vars["test_id"])
 	 if !status["error"] and status["response_code"] == 200
       puts "BlazeMeter status: " + status["status"]
+     else
+      puts "Error retrieving status: " + status["error"]
+     end
+	 
+    rescue "help"
+      return help
+    end
+  end
+  
+  def cmd_options argv
+    begin
+     user_key = Blazemeter::Common.get_user_key
+	 if !user_key
+	   puts "You must enter API Key. Use blazemeter api:init"
+	   return
+	 end
+	 vars = Blazemeter::Command::Test.parse argv
+	 
+	 if !vars["test_id"]
+       puts "Enter test id: "
+	   user_input = gets
+	   vars["test_id"] = user_input.chomp
+     end
+	 
+	 if vars["test_id"] == ''
+	   puts "Test id is required"
+	   exit
+	 end
+	
+	 blaze = BlazemeterApi.new(user_key)
+	 status = blaze.testGetStatus(vars["test_id"], true)
+	 if !status["error"] and status["response_code"] == 200
+      puts "BlazeMeter options: "
+	  puts status
      else
       puts "Error retrieving status: " + status["error"]
      end
@@ -364,7 +469,7 @@ def cmd_create argv
 
                 k = argv.shift
                 if ['-u'].member? k
-                    hash['options']['MAX_USERS'] = shift(k, argv)
+                    hash['options']['USERS'] = shift(k, argv)
                     next
                 end
 				if ['-n'].member? k

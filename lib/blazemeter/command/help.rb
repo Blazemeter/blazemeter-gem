@@ -8,12 +8,14 @@ class Help < Command # :nodoc:
             { :cmd => 'help', :help => 'Display this help' },
 			{ :cmd => 'help:locations', :help => 'Display list of available test geo locations' },
             { :cmd => 'api:init', :help => 'Store your API key' },
-			{ :cmd => 'api:login', :help => 'Reenter your API key' },
+			{ :cmd => 'api:reset', :help => 'Remove your API key' },
+			{ :cmd => 'api:validoptions', :help => 'Returns a list of available options that can be used for test creation or modification.' },
             { :cmd => 'test:create', :help => 'generate blazemeter test' },
             { :cmd => 'test:start', :help => 'starts blazemeter test' },
 			{ :cmd => 'test:stop', :help => 'stops blazemeter test' },
 			{ :cmd => 'test:update', :help => 'updates blazemeter test' },
 			{ :cmd => 'test:status', :help => 'show blazemeter test status' },
+			{ :cmd => 'test:options', :help => 'show blazemeter test options' },
 			{ :cmd => 'test:query', :help => 'returns the report (a zip file)' }
         ]
         

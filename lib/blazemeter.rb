@@ -30,6 +30,7 @@ end
 
 class BlazemeterApi
   @@url = 'https://a.blazemeter.com'
+  #@@url = 'http://vitali.a.blazemeter.com'
   #@@url = 'http://localhost/ablazemetercom'
   
   def initialize(user_key)
@@ -77,13 +78,15 @@ class BlazemeterApi
   end
   
   def getFile(url, filepath)
-    uri = URI.parse(url)
+    puts url
+	uri = URI.parse(url)
     https = get_https(uri)
     resp = https.get(uri.request_uri)
-	
-    open(filepath, "wb") do |file|
-        file.write(resp.body)
-	end
+    File.open(filepath, "w") do |file|
+      file.binmode #windows
+      file.write resp.body
+      file.close
+    end	
   end
   
   def normalizeOptions(options)
@@ -158,7 +161,9 @@ class BlazemeterApi
   
   def testUpdate(test_id, options=nil)
     path = '/api/rest/blazemeter/testUpdate.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
-    response = post(path, options)
+    options = normalizeOptions(options)
+   puts options
+	response = post(path, options)
    
    if response.body == ''
      puts "BlazeMeter server not responding"
@@ -195,6 +200,13 @@ class BlazemeterApi
     #else
      #puts "Error retrieving status: " + ret["error"]
     #end   
+  end
+  
+  def getOptions()
+    path = '/api/rest/blazemeter/getAvailableOptions.json?user_key=' + @user_key
+	response = get(path)
+    ret = JSON.parse(response.body)
+	return ret["options"]
   end
   
   def testLoad(test_id)
@@ -253,11 +265,10 @@ class BlazemeterApi
      puts "BlazeMeter returned error: "+ret["error"]
    else
      if ret["response_code"] == 200
-	 puts ret
-	  puts "BlazeMeter script uploaded sucessfully"
+	  puts "JMX script uploaded sucessfully to BlazeMeter"
       return true
 	 else 
-       puts "BlazeMeter script couldn't be uploaded. Error:"+ret["error"].to_s
+       puts "JMX script couldn't be uploaded. Error:"+ret["error"].to_s
 	 end
    end
    return false
