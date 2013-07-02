@@ -142,7 +142,7 @@ def cmd_create argv
 	 end
 	 
 	 options["options"] = vars["options"]
-#puts options
+
 	 blaze = BlazemeterApi.new(user_key)
 	 test_id = blaze.testCreate(test_name, options)
 	 if test_id

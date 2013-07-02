@@ -47,7 +47,6 @@ class BlazemeterApi
   def post(path, options=nil)
     uri = URI.parse(@@url+path)
 	options = options.to_json
-#puts options
     https = get_https(uri)
     req = Net::HTTP::Post.new(uri.request_uri, initheader = {'Content-Type' =>'application/json'})
 	req.body = options
@@ -60,8 +59,7 @@ class BlazemeterApi
 	postdata = Hash.new
 	file = File.open(filepath, "rb")
     f = file.read
-	postdata['data'] = Base64.encode64(f.to_s)
-
+	postdata['data'] = f.to_s
     https = get_https(uri)
     req = Net::HTTP::Post.new(uri.request_uri, initheader = {'Content-Type' =>'application/json'})
 	req.body = postdata.to_json
@@ -78,7 +76,6 @@ class BlazemeterApi
   end
   
   def getFile(url, filepath)
-    puts url
 	uri = URI.parse(url)
     https = get_https(uri)
     resp = https.get(uri.request_uri)
@@ -106,7 +103,6 @@ class BlazemeterApi
    
    path = '/api/rest/blazemeter/testCreate.json?user_key=' + @user_key + '&test_name=' + URI.escape(test_name) 
    options = normalizeOptions(options)
-   puts options
    response = post(path, options)
 
    if response.body == ''
@@ -162,7 +158,6 @@ class BlazemeterApi
   def testUpdate(test_id, options=nil)
     path = '/api/rest/blazemeter/testUpdate.json?user_key=' + @user_key + '&test_id=' + test_id.to_s 
     options = normalizeOptions(options)
-   puts options
 	response = post(path, options)
    
    if response.body == ''
@@ -194,12 +189,7 @@ class BlazemeterApi
     
 	response = get(path)
     ret = JSON.parse(response.body)
-	return ret
-	#if !ret["error"] and ret["response_code"] == 200
-     # puts "BlazeMeter status: " + ret["status"]
-    #else
-     #puts "Error retrieving status: " + ret["error"]
-    #end   
+	return ret 
   end
   
   def getOptions()
@@ -232,6 +222,7 @@ class BlazemeterApi
 		  zip_url = ret["reports"][index]["zip_url"]
 		  filename = File.basename zip_url
 		  filepath = Dir.home+"/"+ filename
+		  zip_url = zip_url + '?api_key=' + @user_key #we need api_key to access report
 		  getFile(zip_url,filepath)
 		  #todo: check that its downloaded
 		  puts "Zip report downloaded to "+filepath

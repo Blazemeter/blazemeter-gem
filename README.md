@@ -1,6 +1,9 @@
 # Blazemeter
 
-TODO: Write a gem description
+BlazeMeter is add-on that provides an integrated self-service, on-demand, cloud-based, 100% JMeter 
+compatible load and performance testing for your web and mobile apps. BlazeMeter provides developers 
+and QA professionals the ability to script complex user sequences and scenarios to execute extra high 
+capacity loads using a self-service, on demand platform.
 
 ## Installation
 
@@ -18,13 +21,12 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions
-
 You can use BlazeMeter either from command line or from your Ruby code. 
 
 ### Command line usage
 
 First you must initialize your Blazemeter instance:
+
     blazemeter api:init
 	
 or

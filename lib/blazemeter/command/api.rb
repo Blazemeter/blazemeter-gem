@@ -51,7 +51,7 @@ class API < Command # :nodoc:
 	   return
 	 end
 	blaze = BlazemeterApi.new(user_key)
-	puts "Valid options: "
+	puts "Valid options for your account: "
     puts blaze.getOptions()	
   end
 
