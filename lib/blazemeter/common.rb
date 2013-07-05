@@ -1,10 +1,29 @@
 class Blazemeter
 class Common # :nodoc:	
 	def self.read_credentials
+	  if(!File.exists?(credentials_file))
+	    write_credentials(nil)
+	  end
         File.exists?(credentials_file) and File.read(credentials_file).split("\n")        
     end
     def self.credentials_file
         ENV['HOME'] + '/.blazemeter/credentials'
+    end
+	def self.init_credentials
+     FileUtils.mkdir_p(File.dirname(credentials_file))
+     set_credentials_permissions
+    end
+	def self.write_credentials(user_key)
+        FileUtils.mkdir_p(File.dirname(credentials_file))
+        File.open(credentials_file, 'w') do |f|
+          f.puts user_key
+        end
+        set_credentials_permissions
+    end
+	
+	def self.set_credentials_permissions
+        FileUtils.chmod 0700, File.dirname(credentials_file)
+        FileUtils.chmod 0600, credentials_file        
     end
 	def self.get_user_key
       read_credentials[0]

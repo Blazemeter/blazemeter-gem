@@ -70,21 +70,9 @@ class API < Command # :nodoc:
         return apik.chomp.strip
   end
   
-  
-  
   def write_credentials
-        FileUtils.mkdir_p(File.dirname(credentials_file))
-        File.open(credentials_file, 'w') do |f|
-          f.puts @user_key
-        end
-        set_credentials_permissions
-    end
-	
-	def set_credentials_permissions
-        FileUtils.chmod 0700, File.dirname(credentials_file)
-        FileUtils.chmod 0600, credentials_file        
-    end
-	
+       Blazemeter::Common.write_credentials(@user_key)
+  end
 end
 Api = API
 end # Command
