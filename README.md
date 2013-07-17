@@ -1,4 +1,4 @@
-# Blazemeter
+# BlazeMeter
 
 BlazeMeter is add-on that provides an integrated self-service, on-demand, cloud-based, 100% JMeter 
 compatible load and performance testing for your web and mobile apps. BlazeMeter provides developers 
@@ -25,7 +25,7 @@ You can use BlazeMeter either from command line or from your Ruby code.
 
 ### Command line usage
 
-First you must initialize your Blazemeter instance:
+First you must initialize your BlazeMeter instance:
 
     blazemeter api:init
 	
@@ -33,7 +33,7 @@ or
 	
 	blazemeter api:init -a XXXYYY
 
-This will prompt you to enter your user key which will be saved so you don't need to do it again.
+This will prompt a you to enter your user key which will be saved so you don't need to do it again.
 However if you want to change your user key you can do it by removing the current key using api:reset command:
 
     blazemeter api:reset
@@ -67,8 +67,8 @@ To update a test:
 
      blazemeter test:update
 	 
--this will prompt you to enter test id, max users (or max users per load engine if -en is set), location, jmeter version, ramp up, iterations, duration and number of engines for the test
--you can also prefil those values
+-this will prompt you to enter test id, max users (or max users per load engine if -en is set), location, jmeter version, ramp up, iterations, duration and number of engines for the test.
+(you can also prepopulate those values)
 
      blazemeter test:update -id 123 -u 500 -l us-east-1 -j 2.9 -r 300 -i 100 -d 100 -en 2
 	 
@@ -94,7 +94,7 @@ To get list of valid locations:
 
 ### Usage from the Ruby code
 
-To use BlazeMeter in your ruby code, first you must include it:
+To use BlazeMeter in your Ruby code, first you must include it:
 
      require "blazemeter"
 
