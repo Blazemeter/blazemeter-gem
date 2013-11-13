@@ -1,4 +1,4 @@
-Copyright (c) 2013 Tamer Zoubi
+Copyright (c) 2013 BlazeMeter, Ltd.
 
 MIT License
 
