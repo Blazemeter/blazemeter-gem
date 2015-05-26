@@ -2,7 +2,7 @@ require 'test/unit/assertions'
 
 # The default template string contains what was sent and received. Strip 
 # these out since we don't need them
-unless RUBY_VERSION =~ /^1.9/
+unless RUBY_VERSION >= "1.9"
     module Test # :nodoc:
         module Unit # :nodoc:
             module Assertions # :nodoc:
